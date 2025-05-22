@@ -17,12 +17,12 @@ export class CategoryService {
 
   async getCategoriesWithSubcategories() {
     const categories = await this.categoryRepository.find();
-    const subcategories = await this.subcategoryRepository.find();
+    const subcategories = await this.subcategoryRepository.find({ relations: ['category'] });
 
     return categories.map((category) => ({
       id: category.id,
       name: category.name,
-      subcategories: subcategories.filter((sub) => sub.category.id === category.id),
+      subcategories: subcategories.filter((sub) => sub.category && sub.category.id === category.id),
     }));
   }
 
@@ -31,11 +31,17 @@ export class CategoryService {
     return this.categoryRepository.save(category);
   }
 
-  async updateCategory(id: number, updateCategoryDto: any): Promise<UpdateResult> {
+  async updateCategory(id: number, updateCategoryDto: any, user: { id: number; role: string }): Promise<UpdateResult> {
+    if (user.role !== 'Manager') {
+      throw new Error('Only users with the Manager role can update categories.');
+    }
     return this.categoryRepository.update(id, updateCategoryDto);
   }
 
-  async deleteCategory(id: number): Promise<DeleteResult> {
+  async deleteCategory(id: number, user: { id: number; role: string }): Promise<DeleteResult> {
+    if (user.role !== 'Manager') {
+      throw new Error('Only users with the Manager role can delete categories.');
+    }
     return this.categoryRepository.delete(id);
   }
 

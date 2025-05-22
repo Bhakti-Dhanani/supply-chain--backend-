@@ -18,7 +18,9 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: any) {
-    this.logger.debug(`Returning user from JWT payload: ${JSON.stringify({ id: payload.sub, role: payload.role })}`);
-    return { id: payload.sub, role: payload.role };
+    this.logger.debug(`JWT Payload: ${JSON.stringify(payload)}`);
+    const user = { id: payload.sub, role: payload.role };
+    this.logger.debug(`User extracted from JWT: ${JSON.stringify(user)}`);
+    return user;
   }
 }
