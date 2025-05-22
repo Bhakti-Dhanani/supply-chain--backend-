@@ -64,6 +64,10 @@ export class WarehouseService {
 
   async deleteWarehouse(id: number) {
     const warehouse = await this.getWarehouseById(id);
+
+    // Delete related entries in the warehouse-managers table
+    await this.warehouseManagerRepository.delete({ assigned_warehouse: { id } });
+
     await this.warehouseRepository.remove(warehouse);
     return { message: `Warehouse with ID ${id} deleted successfully.` };
   }

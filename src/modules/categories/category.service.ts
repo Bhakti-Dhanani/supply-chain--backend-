@@ -4,6 +4,7 @@ import { Repository, UpdateResult, DeleteResult } from 'typeorm';
 import { Category } from './category.entity';
 import { Subcategory } from '../subcategories/subcategory.entity';
 import { CreateCategoryDto } from './dto/create-category.dto';
+import { CreateSubcategoryDto } from '../subcategories/dto/create-subcategory.dto';
 
 @Injectable()
 export class CategoryService {
@@ -16,12 +17,12 @@ export class CategoryService {
 
   async getCategoriesWithSubcategories() {
     const categories = await this.categoryRepository.find();
-    const subcategories = await this.subcategoryRepository.find();
+    const subcategories = await this.subcategoryRepository.find({ relations: ['category'] });
 
     return categories.map((category) => ({
       id: category.id,
       name: category.name,
-      subcategories: subcategories.filter((sub) => sub.category.id === category.id),
+      subcategories: subcategories.filter((sub) => sub.category && sub.category.id === category.id),
     }));
   }
 
@@ -30,11 +31,42 @@ export class CategoryService {
     return this.categoryRepository.save(category);
   }
 
-  async updateCategory(id: number, updateCategoryDto: any): Promise<UpdateResult> {
+  async updateCategory(id: number, updateCategoryDto: any, user: { id: number; role: string }): Promise<UpdateResult> {
+    if (user.role !== 'Manager') {
+      throw new Error('Only users with the Manager role can update categories.');
+    }
     return this.categoryRepository.update(id, updateCategoryDto);
   }
 
-  async deleteCategory(id: number): Promise<DeleteResult> {
+  async deleteCategory(id: number, user: { id: number; role: string }): Promise<DeleteResult> {
+    if (user.role !== 'Manager') {
+      throw new Error('Only users with the Manager role can delete categories.');
+    }
     return this.categoryRepository.delete(id);
+  }
+
+  async createSubcategory(categoryId: number, createSubcategoryDto: CreateSubcategoryDto): Promise<Subcategory> {
+    const category = await this.categoryRepository.findOne({ where: { id: categoryId } });
+    if (!category) {
+      throw new Error('Category not found');
+    }
+    const subcategory = this.subcategoryRepository.create({ ...createSubcategoryDto, category });
+    return this.subcategoryRepository.save(subcategory);
+  }
+
+  async updateSubcategory(categoryId: number, subcategoryId: number, updateSubcategoryDto: any): Promise<UpdateResult> {
+    const subcategory = await this.subcategoryRepository.findOne({ where: { id: subcategoryId, category: { id: categoryId } } });
+    if (!subcategory) {
+      throw new Error('Subcategory not found');
+    }
+    return this.subcategoryRepository.update(subcategoryId, updateSubcategoryDto);
+  }
+
+  async deleteSubcategory(categoryId: number, subcategoryId: number): Promise<DeleteResult> {
+    const subcategory = await this.subcategoryRepository.findOne({ where: { id: subcategoryId, category: { id: categoryId } } });
+    if (!subcategory) {
+      throw new Error('Subcategory not found');
+    }
+    return this.subcategoryRepository.delete(subcategoryId);
   }
 }

@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, CreateDateColumn } from 'typeorm';
 import { Category } from '../categories/category.entity';
 
 @Entity('subcategories')
@@ -6,7 +6,7 @@ export class Subcategory {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => Category, (category) => category.id)
+  @ManyToOne(() => Category, (category) => category.subcategories, { onDelete: 'CASCADE' })
   category: Category;
 
   @Column()
@@ -14,4 +14,7 @@ export class Subcategory {
 
   @Column('text')
   description: string;
+
+  @CreateDateColumn()
+  created_at: Date;
 }
