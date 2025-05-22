@@ -1,4 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, OneToMany } from 'typeorm';
+import { Subcategory } from '../subcategories/subcategory.entity';
 
 @Entity('categories')
 export class Category {
@@ -13,13 +14,15 @@ export class Category {
 
   @CreateDateColumn()
   created_at: Date;
+
+  @OneToMany(() => Subcategory, (subcategory) => subcategory.category)
+  subcategories: Subcategory[];
 }
 
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CategoryController } from './category.controller';
 import { CategoryService } from './category.service';
-import { Subcategory } from '../subcategories/subcategory.entity';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Category, Subcategory])],
