@@ -19,7 +19,7 @@ export class RolesGuard implements CanActivate {
 
     console.log('User in RolesGuard:', user);
 
-    // Allow only users with the 'Manager' role
-    return user.role === 'Manager';
+    // Allow only users with the 'Manager' or 'Admin' role
+    return user.role === 'Manager' || user.role === 'Admin';
   }
 }

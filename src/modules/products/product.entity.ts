@@ -24,6 +24,9 @@ export class Product {
   @Column()
   sku: string;
 
+  @Column('int', { default: 0 })
+  quantity: number;
+
   @ManyToOne(() => Category, (category) => category.id)
   category: Category;
 

@@ -8,5 +8,6 @@ import { StockMovement } from './stock-movement.entity';
   imports: [TypeOrmModule.forFeature([StockMovement])],
   controllers: [StockMovementController],
   providers: [StockMovementService],
+  exports: [StockMovementService],
 })
 export class StockMovementModule {}
