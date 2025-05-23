@@ -43,6 +43,7 @@ import { WarehouseModule } from './modules/warehouses/warehouse.module';
 import { Location } from './modules/location/location.entity';
 import { WarehouseLocation } from './modules/warehouse-locations/warehouse-location.entity';
 import { WarehouseLocationModule } from './modules/warehouse-locations/warehouse-location.module';
+import { VehicleModule } from './modules/vehicles/vehicle.module';
 
 @Module({
   imports: [
@@ -91,6 +92,7 @@ import { WarehouseLocationModule } from './modules/warehouse-locations/warehouse
     SubcategoryModule,
     WarehouseModule, // Ensure WarehouseModule is included
     WarehouseLocationModule,
+    VehicleModule,
   ],
   controllers: [AppController],
   providers: [AppService],

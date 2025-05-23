@@ -8,5 +8,6 @@ import { Transporter } from './transporter.entity';
   imports: [TypeOrmModule.forFeature([Transporter])],
   controllers: [TransporterController],
   providers: [TransporterService],
+  exports: [TypeOrmModule],
 })
 export class TransporterModule {}

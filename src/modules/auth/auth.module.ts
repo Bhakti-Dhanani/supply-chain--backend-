@@ -20,7 +20,7 @@ import { WarehouseModule } from '../warehouses/warehouse.module'; // Import Ware
     WarehouseModule, // Import WarehouseModule to provide WarehouseRepository
     JwtModule.register({
       secret: process.env.JWT_SECRET || 'defaultSecret',
-      signOptions: { expiresIn: '1h' },
+      signOptions: { expiresIn: '10d' },
     }),
   ],
   controllers: [AuthController],

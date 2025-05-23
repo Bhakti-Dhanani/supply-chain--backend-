@@ -10,9 +10,6 @@ export class Transporter {
   user: User;
 
   @Column()
-  company_name: string;
-
-  @Column()
   vehicle_count: number;
 
   @CreateDateColumn()

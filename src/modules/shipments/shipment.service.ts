@@ -25,7 +25,7 @@ export class ShipmentService {
     return {
       id: shipment.id,
       orderId: shipment.order.id,
-      transporter: shipment.transporter?.company_name,
+      transporter: shipment.transporter?.id, // Updated to use transporter ID instead of company_name
       vehicle: shipment.vehicle?.plate_number,
       routeLog: [], // Add route log if available
       statusHistory: [], // Add status history if available
