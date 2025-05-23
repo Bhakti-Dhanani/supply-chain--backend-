@@ -1,5 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, CreateDateColumn } from 'typeorm';
 import { Vendor } from '../vendors/vendor.entity';
+import { User } from '../users/user.entity';
 
 export enum OrderStatus {
   PENDING = 'Pending',
@@ -13,8 +14,8 @@ export class Order {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => Vendor, (vendor) => vendor.id)
-  vendor: Vendor;
+  @ManyToOne(() => User, { nullable: false })
+  vendor: User;
 
   @Column({ type: 'enum', enum: OrderStatus })
   status: OrderStatus;
