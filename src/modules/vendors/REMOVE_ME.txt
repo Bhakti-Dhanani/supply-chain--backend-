@@ -1,0 +1,1 @@
+This folder is deprecated. All vendor logic is now handled via the User entity and JWT token. Vendor entity, service, controller, module, and DTOs have been removed.
