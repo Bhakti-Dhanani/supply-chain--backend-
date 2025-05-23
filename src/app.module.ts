@@ -40,6 +40,9 @@ import { File } from './modules/files/file.entity';
 import { AuditLog } from './modules/audit-logs/audit-log.entity';
 import { WarehouseProduct } from './modules/warehouse-products/warehouse-product.entity';
 import { WarehouseModule } from './modules/warehouses/warehouse.module';
+import { Location } from './modules/location/location.entity';
+import { WarehouseLocation } from './modules/warehouse-locations/warehouse-location.entity';
+import { WarehouseLocationModule } from './modules/warehouse-locations/warehouse-location.module';
 
 @Module({
   imports: [
@@ -47,7 +50,6 @@ import { WarehouseModule } from './modules/warehouses/warehouse.module';
       ...databaseConfig,
       entities: [
         User,
-        
         Vendor,
         Transporter,
         WarehouseManager,
@@ -68,6 +70,8 @@ import { WarehouseModule } from './modules/warehouses/warehouse.module';
         File,
         AuditLog,
         WarehouseProduct,
+        Location,
+        WarehouseLocation,
       ],
     }),
     AuthModule,
@@ -86,6 +90,7 @@ import { WarehouseModule } from './modules/warehouses/warehouse.module';
     CategoryModule,
     SubcategoryModule,
     WarehouseModule, // Ensure WarehouseModule is included
+    WarehouseLocationModule,
   ],
   controllers: [AppController],
   providers: [AppService],

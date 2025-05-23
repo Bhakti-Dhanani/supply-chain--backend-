@@ -1,5 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, CreateDateColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, CreateDateColumn, JoinColumn } from 'typeorm';
 import { User } from '../users/user.entity';
+import { WarehouseLocation } from '../warehouse-locations/warehouse-location.entity';
 
 @Entity('warehouses')
 export class Warehouse {
@@ -9,8 +10,9 @@ export class Warehouse {
   @Column()
   name: string;
 
-  @Column()
-  location: string;
+  @ManyToOne(() => WarehouseLocation, { nullable: true })
+  @JoinColumn()
+  location: WarehouseLocation;
 
   @ManyToOne(() => User, (user) => user.warehouses, { nullable: false })
   manager: User;

@@ -10,13 +10,16 @@ import { SocketModule } from '../../common/gateway/socket.module';
 import { NotificationService } from '../notifications/notification.service';
 import { Product } from '../products/product.entity';
 import { Warehouse } from '../warehouses/warehouse.entity';
+import { LocationModule } from '../location/location.module';
+import { Location } from '../location/location.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Order, OrderItem, Product, Warehouse]),
+    TypeOrmModule.forFeature([Order, OrderItem, Product, Warehouse, Location]),
     ProductModule,
     NotificationModule,
     SocketModule,
+    LocationModule,
   ],
   controllers: [OrderController],
   providers: [OrderService, NotificationService],

@@ -10,7 +10,18 @@ export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
   @Post()
-  async createOrder(@User() user: UserEntity, @Body() createOrderDto: { vendorId: number; warehouseId: number; items: { productId: number; quantity: number }[] }) {
+  async createOrder(
+    @User() user: UserEntity,
+    @Body() createOrderDto: {
+      warehouseId: number;
+      items: { productId: number; quantity: number }[];
+      house: string;
+      street: string;
+      city: string;
+      state: string;
+      country: string;
+    }
+  ) {
     if (!user || !user.id) {
       throw new UnauthorizedException('User not found in request. Make sure authentication is enabled and @User() decorator is working.');
     }

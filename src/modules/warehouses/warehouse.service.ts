@@ -4,6 +4,8 @@ import { Repository } from 'typeorm';
 import { Warehouse } from './warehouse.entity';
 import { User } from '../users/user.entity';
 import { WarehouseManager } from '../warehouse-managers/warehouse-manager.entity';
+import { WarehouseLocationService } from '../warehouse-locations/warehouse-location.service';
+import { CreateWarehouseLocationDto } from '../warehouse-locations/dto/create-warehouse-location.dto';
 
 @Injectable()
 export class WarehouseService {
@@ -14,6 +16,7 @@ export class WarehouseService {
     private readonly userRepository: Repository<User>,
     @InjectRepository(WarehouseManager)
     private readonly warehouseManagerRepository: Repository<WarehouseManager>,
+    private readonly warehouseLocationService: WarehouseLocationService,
   ) {}
 
   async createWarehouse(createWarehouseDto: any, user: { id: number; role: string }) {
@@ -27,9 +30,22 @@ export class WarehouseService {
     }
 
     try {
-      // Create the warehouse and assign the managerId
+      // Extract address fields for warehouse location
+      const address: CreateWarehouseLocationDto = {
+        house: createWarehouseDto.house,
+        street: createWarehouseDto.street,
+        city: createWarehouseDto.city,
+        state: createWarehouseDto.state,
+        country: createWarehouseDto.country,
+      };
+      // Remove address fields from warehouse payload
+      const { house, street, city, state, country, ...warehouseFields } = createWarehouseDto;
+      // Create warehouse location and get the location ID
+      const locationId = await this.warehouseLocationService.createAndGetLocationId(address);
+      // Create the warehouse and assign the managerId and location ID
       const warehouse = this.warehouseRepository.create({
-        ...createWarehouseDto,
+        ...warehouseFields,
+        location: { id: locationId },
         manager: { id: user.id },
       });
       const savedWarehouse = (await this.warehouseRepository.save(warehouse)) as unknown as Warehouse;

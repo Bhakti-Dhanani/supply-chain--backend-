@@ -10,6 +10,8 @@ import { Warehouse } from '../warehouses/warehouse.entity';
 import { SocketGateway } from '../../common/gateway/socket.gateway';
 import { Notification } from '../notifications/notification.entity';
 import { User } from '../users/user.entity';
+import { LocationService } from '../location/location.service';
+import { Location } from '../location/location.entity';
 
 @Injectable()
 export class OrderService {
@@ -25,9 +27,10 @@ export class OrderService {
     @InjectRepository(Notification)
     private readonly notificationRepository: Repository<Notification>,
     private readonly socketGateway: SocketGateway,
+    private readonly locationService: LocationService,
   ) {}
 
-  async createOrder(user: User, createOrderDto: { warehouseId: number; items: { productId: number; quantity: number }[] }) {
+  async createOrder(user: User, createOrderDto: { warehouseId: number; items: { productId: number; quantity: number }[]; house: string; street: string; city: string; state: string; country: string }) {
     // Use the user from the token as the vendor
     const vendor = await this.orderRepository.manager.findOne('User', { where: { id: user.id } });
     if (!vendor) throw new Error('Vendor user not found');
@@ -62,6 +65,18 @@ export class OrderService {
     order.total_amount = total;
     await this.orderRepository.save(order);
 
+    // Create and save location
+    const location = await this.locationService.createLocation({
+      house: createOrderDto.house,
+      street: createOrderDto.street,
+      city: createOrderDto.city,
+      state: createOrderDto.state,
+      country: createOrderDto.country,
+    });
+    // After creating the location, associate it with the order
+    order.location = location;
+    await this.orderRepository.save(order);
+
     // Send real-time notification to the warehouse manager
     if (manager && manager.id) {
       const message = `A new order (#${order.id}) has been created for your warehouse.`;
@@ -83,12 +98,32 @@ export class OrderService {
     return { orderId: order.id, status: order.status, total: order.total_amount, estimatedDelivery: '2025-05-25' };
   }
 
-  async getOrderById(id: number): Promise<Order> {
-    const order = await this.orderRepository.findOne({ where: { id } });
+  async getOrderById(id: number): Promise<any> {
+    const order = await this.orderRepository.findOne({ where: { id }, relations: ['location'] });
     if (!order) {
       throw new NotFoundException(`Order with ID ${id} not found`);
     }
-    return order;
+    let latitude: number | null = null;
+    let longitude: number | null = null;
+    if (order.location) {
+      latitude = order.location.latitude;
+      longitude = order.location.longitude;
+    }
+    return {
+      id: order.id,
+      status: order.status,
+      total_amount: order.total_amount,
+      created_at: order.created_at,
+      location: order.location ? {
+        house: order.location.house,
+        street: order.location.street,
+        city: order.location.city,
+        state: order.location.state,
+        country: order.location.country,
+        latitude,
+        longitude
+      } : null
+    };
   }
 
   async updateOrderStatus(id: number, updateOrderStatusDto: UpdateOrderStatusDto): Promise<Order> {

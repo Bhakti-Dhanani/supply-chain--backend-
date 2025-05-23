@@ -1,10 +1,6 @@
-import { IsNotEmpty, IsString, IsNumber } from 'class-validator';
+import { IsNotEmpty, IsString } from 'class-validator';
 
-export class CreateWarehouseDto {
-  @IsNotEmpty()
-  @IsString()
-  name: string;
-
+export class CreateWarehouseLocationDto {
   @IsNotEmpty()
   @IsString()
   house: string;
@@ -24,8 +20,4 @@ export class CreateWarehouseDto {
   @IsNotEmpty()
   @IsString()
   country: string;
-
-  @IsNotEmpty()
-  @IsNumber()
-  capacity: number;
 }
