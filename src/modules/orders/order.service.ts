@@ -149,7 +149,9 @@ export class OrderService {
         product: item.product ? { id: item.product.id, name: item.product.name } : null,
         warehouse: item.warehouse ? {
           id: item.warehouse.id,
-          name: item.warehouse.name
+          name: item.warehouse.name,
+          latitude: item.warehouse.location?.latitude || null,
+          longitude: item.warehouse.location?.longitude || null
         } : null
       })) || [],
     };
@@ -158,6 +160,8 @@ export class OrderService {
         id: warehouse.id,
         name: warehouse.name,
         address: warehouse.location ? `${warehouse.location.house}, ${warehouse.location.street}, ${warehouse.location.city}, ${warehouse.location.state}, ${warehouse.location.country}` : '',
+        latitude: warehouse.location?.latitude || null,
+        longitude: warehouse.location?.longitude || null,
         manager: warehouse.manager ? { id: warehouse.manager.id, name: warehouse.manager.name } : null,
       };
     }
