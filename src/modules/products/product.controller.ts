@@ -35,7 +35,11 @@ export class ProductController {
   }
 
   @Get('warehouse/:warehouseId')
-  async getProductsByWarehouse(@Param('warehouseId') warehouseId: number) {
-    return this.productService.getProductsByWarehouse(warehouseId);
+  async getProductsByWarehouse(
+    @Param('warehouseId') warehouseId: number,
+    @Query('categoryId') categoryId?: number,
+    @Query('subcategoryId') subcategoryId?: number,
+  ) {
+    return this.productService.getProductsByWarehouse(warehouseId, categoryId, subcategoryId);
   }
 }

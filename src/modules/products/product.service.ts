@@ -68,11 +68,22 @@ export class ProductService {
     return savedProduct;
   }
 
-  async getProductsByWarehouse(warehouseId: number) {
-    return this.productRepository.find({
-      where: { warehouse: { id: warehouseId } },
-      relations: ['category', 'subcategory', 'warehouse'],
-    });
+  async getProductsByWarehouse(warehouseId: number, categoryId?: number, subcategoryId?: number) {
+    const query = this.productRepository.createQueryBuilder('product')
+      .leftJoinAndSelect('product.category', 'category')
+      .leftJoinAndSelect('product.subcategory', 'subcategory')
+      .leftJoinAndSelect('product.warehouse', 'warehouse')
+      .where('warehouse.id = :warehouseId', { warehouseId });
+
+    if (categoryId) {
+      query.andWhere('category.id = :categoryId', { categoryId });
+    }
+
+    if (subcategoryId) {
+      query.andWhere('subcategory.id = :subcategoryId', { subcategoryId });
+    }
+
+    return query.getMany();
   }
 
   async getAllProducts() {
