@@ -33,4 +33,13 @@ export class ProductController {
   deleteProduct(@Param('id') id: number) {
     return this.productService.deleteProduct(id);
   }
+
+  @Get('warehouse/:warehouseId')
+  async getProductsByWarehouse(
+    @Param('warehouseId') warehouseId: number,
+    @Query('categoryId') categoryId?: number,
+    @Query('subcategoryId') subcategoryId?: number,
+  ) {
+    return this.productService.getProductsByWarehouse(warehouseId, categoryId, subcategoryId);
+  }
 }

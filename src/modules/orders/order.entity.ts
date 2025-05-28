@@ -1,7 +1,8 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, CreateDateColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, CreateDateColumn, OneToMany } from 'typeorm';
 import { Vendor } from '../vendors/vendor.entity';
 import { User } from '../users/user.entity';
 import { Location } from '../location/location.entity';
+import { OrderItem } from '../order-items/order-item.entity';
 
 export enum OrderStatus {
   PENDING = 'Pending',
@@ -29,4 +30,7 @@ export class Order {
 
   @CreateDateColumn()
   created_at: Date;
+
+  @OneToMany(() => OrderItem, (orderItem) => orderItem.order, { eager: true })
+  orderItems: OrderItem[];
 }

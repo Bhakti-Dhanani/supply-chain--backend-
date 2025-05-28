@@ -49,7 +49,7 @@ export class OrderService {
     let total = 0;
     const orderItems: OrderItem[] = [];
     for (const item of createOrderDto.items) {
-      const product = await this.productRepository.findOne({ where: { id: item.productId } });
+      const product = await this.productRepository.findOne({ where: { id: item.productId }, relations: ['warehouse'] });
       if (!product) throw new Error(`Product with id ${item.productId} not found`);
       const price = Number(product.price);
       const orderItem = this.orderItemRepository.create({
@@ -57,6 +57,7 @@ export class OrderService {
         product,
         quantity: item.quantity,
         price,
+        warehouse: warehouse, // Save user-selected warehouse, not product.warehouse
       });
       total += price * item.quantity;
       orderItems.push(orderItem);
@@ -99,7 +100,17 @@ export class OrderService {
   }
 
   async getOrderById(id: number): Promise<any> {
-    const order = await this.orderRepository.findOne({ where: { id }, relations: ['location'] });
+    const order = await this.orderRepository.findOne({
+      where: { id },
+      relations: [
+        'location',
+        'orderItems',
+        'orderItems.product',
+        'orderItems.product.warehouse',
+        'orderItems.product.warehouse.manager',
+        'orderItems.product.warehouse.location',
+      ],
+    });
     if (!order) {
       throw new NotFoundException(`Order with ID ${id} not found`);
     }
@@ -109,7 +120,15 @@ export class OrderService {
       latitude = order.location.latitude;
       longitude = order.location.longitude;
     }
-    return {
+    // Get warehouse from the first order item's product
+    let warehouse: Warehouse | null = null;
+    if (order.orderItems && order.orderItems.length > 0) {
+      const firstProduct = order.orderItems[0].product;
+      if (firstProduct && firstProduct.warehouse) {
+        warehouse = firstProduct.warehouse;
+      }
+    }
+    const response: any = {
       id: order.id,
       status: order.status,
       total_amount: order.total_amount,
@@ -122,8 +141,31 @@ export class OrderService {
         country: order.location.country,
         latitude,
         longitude
-      } : null
+      } : null,
+      items: order.orderItems?.map(item => ({
+        id: item.id,
+        quantity: item.quantity,
+        price: item.price,
+        product: item.product ? { id: item.product.id, name: item.product.name } : null,
+        warehouse: item.warehouse ? {
+          id: item.warehouse.id,
+          name: item.warehouse.name,
+          latitude: item.warehouse.location?.latitude || null,
+          longitude: item.warehouse.location?.longitude || null
+        } : null
+      })) || [],
     };
+    if (warehouse) {
+      response.warehouse = {
+        id: warehouse.id,
+        name: warehouse.name,
+        address: warehouse.location ? `${warehouse.location.house}, ${warehouse.location.street}, ${warehouse.location.city}, ${warehouse.location.state}, ${warehouse.location.country}` : '',
+        latitude: warehouse.location?.latitude || null,
+        longitude: warehouse.location?.longitude || null,
+        manager: warehouse.manager ? { id: warehouse.manager.id, name: warehouse.manager.name } : null,
+      };
+    }
+    return response;
   }
 
   async updateOrderStatus(id: number, updateOrderStatusDto: UpdateOrderStatusDto): Promise<Order> {
@@ -136,5 +178,50 @@ export class OrderService {
     const order = await this.getOrderById(id);
     order.status = OrderStatus.CANCELLED;
     await this.orderRepository.save(order);
+  }
+
+  async getOrdersByVendor(vendorId: number): Promise<any[]> {
+    const orders = await this.orderRepository.find({
+      where: { vendor: { id: vendorId } },
+      relations: [
+        'location',
+        'orderItems',
+        'orderItems.product',
+        'orderItems.product.warehouse',
+        'orderItems.product.warehouse.manager',
+      ],
+      order: { created_at: 'DESC' },
+    });
+    return orders.map(order => {
+      // Get warehouse from the first order item (assuming all items are from the same warehouse)
+      const warehouse = order.orderItems?.[0]?.product?.warehouse;
+      return {
+        id: order.id,
+        status: order.status,
+        total_amount: order.total_amount,
+        created_at: order.created_at,
+        location: order.location ? {
+          house: order.location.house,
+          street: order.location.street,
+          city: order.location.city,
+          state: order.location.state,
+          country: order.location.country,
+          latitude: order.location.latitude,
+          longitude: order.location.longitude,
+        } : null,
+        warehouse: warehouse ? {
+          id: warehouse.id,
+          name: warehouse.name,
+          address: warehouse.location ? `${warehouse.location.house}, ${warehouse.location.street}, ${warehouse.location.city}, ${warehouse.location.state}, ${warehouse.location.country}` : '',
+          manager: warehouse.manager ? { id: warehouse.manager.id, name: warehouse.manager.name } : null,
+        } : null,
+        items: order.orderItems?.map(item => ({
+          id: item.id,
+          quantity: item.quantity,
+          price: item.price,
+          product: item.product ? { id: item.product.id, name: item.product.name } : null,
+        })) || [],
+      };
+    });
   }
 }

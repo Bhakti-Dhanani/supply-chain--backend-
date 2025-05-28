@@ -1,6 +1,7 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, CreateDateColumn, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, CreateDateColumn, JoinColumn, OneToMany } from 'typeorm';
 import { User } from '../users/user.entity';
 import { WarehouseLocation } from '../warehouse-locations/warehouse-location.entity';
+import { WarehouseProduct } from '../warehouse-products/warehouse-product.entity';
 
 @Entity('warehouses')
 export class Warehouse {
@@ -22,4 +23,7 @@ export class Warehouse {
 
   @CreateDateColumn()
   created_at: Date;
+
+  @OneToMany(() => WarehouseProduct, (warehouseProduct) => warehouseProduct.warehouse)
+  products: WarehouseProduct[];
 }
