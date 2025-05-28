@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Get, Put, Delete, Param, UnauthorizedException, UseGuards } from '@nestjs/common';
+import { Body, Controller, Post, Get, Put, Delete, Param, UnauthorizedException, UseGuards, Query } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { OrderService } from './order.service';
 import { User } from '../../common/decorators/user.decorator';
@@ -28,9 +28,14 @@ export class OrderController {
     return this.orderService.createOrder(user, createOrderDto);
   }
 
+  @Get('my')
+  async getMyOrders(@User() user: UserEntity) {
+    return this.orderService.getOrdersByVendor(user.id);
+  }
+
   @Get(':id')
-  getOrderById(@Param('id') id: number) {
-    return this.orderService.getOrderById(id);
+  async getOrderById(@Param('id') id: number) {
+    return await this.orderService.getOrderById(id);
   }
 
   @Put(':id')

@@ -1,5 +1,4 @@
-import { Injectable, UnauthorizedException, NotFoundException, InternalServerErrorException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
+import { Injectable, UnauthorizedException, NotFoundException, InternalServerErrorException, Inject } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { Warehouse } from './warehouse.entity';
 import { User } from '../users/user.entity';
@@ -10,11 +9,11 @@ import { CreateWarehouseLocationDto } from '../warehouse-locations/dto/create-wa
 @Injectable()
 export class WarehouseService {
   constructor(
-    @InjectRepository(Warehouse)
+    @Inject('WAREHOUSE_REPOSITORY')
     private readonly warehouseRepository: Repository<Warehouse>,
-    @InjectRepository(User)
+    @Inject('USER_REPOSITORY')
     private readonly userRepository: Repository<User>,
-    @InjectRepository(WarehouseManager)
+    @Inject('WAREHOUSE_MANAGER_REPOSITORY')
     private readonly warehouseManagerRepository: Repository<WarehouseManager>,
     private readonly warehouseLocationService: WarehouseLocationService,
   ) {}
@@ -86,5 +85,11 @@ export class WarehouseService {
 
     await this.warehouseRepository.remove(warehouse);
     return { message: `Warehouse with ID ${id} deleted successfully.` };
+  }
+
+  async getAllWarehouses() {
+    return this.warehouseRepository.find({
+      select: ['id', 'name', 'capacity', 'created_at'],
+    });
   }
 }

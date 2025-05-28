@@ -1,19 +1,17 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
+import { Injectable, NotFoundException, forwardRef, Inject } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { Product } from './product.entity';
 import { Category } from '../categories/category.entity';
 import { Subcategory } from '../subcategories/subcategory.entity';
 import { Warehouse } from '../warehouses/warehouse.entity';
-import { StockMovementService } from '../stock-movements/stock-movement.service';
-import { MovementType } from '../stock-movements/stock-movement.entity';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Injectable()
 export class ProductService {
   constructor(
-    @InjectRepository(Product)
+    @Inject('PRODUCT_REPOSITORY')
     private readonly productRepository: Repository<Product>,
-    private readonly stockMovementService: StockMovementService,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   async createProduct(createProductDto: any) {
@@ -41,13 +39,8 @@ export class ProductService {
       existingProduct.quantity += quantity;
       const updatedProduct = await this.productRepository.save(existingProduct);
 
-      // Record stock movement
-      await this.stockMovementService.recordStockMovement({
-        product: updatedProduct,
-        warehouse: updatedProduct.warehouse,
-        quantity,
-        movement_type: MovementType.IN,
-      });
+      // Emit an event instead of directly calling StockMovementService
+      this.eventEmitter.emit('product.updated', { product: updatedProduct, quantity });
 
       return updatedProduct;
     }
@@ -69,19 +62,17 @@ export class ProductService {
     });
     const savedProduct = await this.productRepository.save(product);
 
-    // Record stock movement
-    await this.stockMovementService.recordStockMovement({
-      product: savedProduct,
-      warehouse,
-      quantity,
-      movement_type: MovementType.IN,
-    });
+    // Emit an event instead of directly calling StockMovementService
+    this.eventEmitter.emit('product.created', { product: savedProduct, quantity });
 
     return savedProduct;
   }
 
   async getProductsByWarehouse(warehouseId: number) {
-    return this.productRepository.find({ where: { warehouse: { id: warehouseId } } });
+    return this.productRepository.find({
+      where: { warehouse: { id: warehouseId } },
+      relations: ['category', 'subcategory', 'warehouse'],
+    });
   }
 
   async getAllProducts() {

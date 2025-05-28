@@ -17,6 +17,11 @@ export class WarehouseController {
     return this.warehouseService.createWarehouse(createWarehouseDto, user);
   }
 
+  @Get()
+  async getAllWarehouses() {
+    return this.warehouseService.getAllWarehouses();
+  }
+
   @Get(':id')
   async getWarehouseById(@Param('id') id: number) {
     return this.warehouseService.getWarehouseById(id);

@@ -44,6 +44,7 @@ import { Location } from './modules/location/location.entity';
 import { WarehouseLocation } from './modules/warehouse-locations/warehouse-location.entity';
 import { WarehouseLocationModule } from './modules/warehouse-locations/warehouse-location.module';
 import { VehicleModule } from './modules/vehicles/vehicle.module';
+import { DataSource } from 'typeorm';
 
 @Module({
   imports: [
@@ -90,11 +91,12 @@ import { VehicleModule } from './modules/vehicles/vehicle.module';
     StockMovementModule,
     CategoryModule,
     SubcategoryModule,
-    WarehouseModule, // Ensure WarehouseModule is included
+    WarehouseModule,
     WarehouseLocationModule,
     VehicleModule,
   ],
   controllers: [AppController],
   providers: [AppService],
+  exports: [TypeOrmModule],
 })
 export class AppModule {}
