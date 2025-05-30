@@ -11,8 +11,15 @@ export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
   @Get()
-  async getProducts(@Query('warehouseId') warehouseId: number) {
-    return this.productService.getProductsByWarehouse(warehouseId);
+  async getAllProducts(
+    @Query('warehouseId') warehouseId?: number,
+    @Query('categoryId') categoryId?: number,
+    @Query('subcategoryId') subcategoryId?: number,
+  ) {
+    if (warehouseId) {
+      return this.productService.getProductsByWarehouse(warehouseId, categoryId, subcategoryId);
+    }
+    return this.productService.getAllProducts();
   }
 
   @Post()
@@ -34,12 +41,8 @@ export class ProductController {
     return this.productService.deleteProduct(id);
   }
 
-  @Get('warehouse/:warehouseId')
-  async getProductsByWarehouse(
-    @Param('warehouseId') warehouseId: number,
-    @Query('categoryId') categoryId?: number,
-    @Query('subcategoryId') subcategoryId?: number,
-  ) {
-    return this.productService.getProductsByWarehouse(warehouseId, categoryId, subcategoryId);
+  @Get(':id')
+  async getProductById(@Param('id') id: number) {
+    return this.productService.getProductById(id);
   }
 }

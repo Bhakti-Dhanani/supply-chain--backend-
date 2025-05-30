@@ -22,6 +22,13 @@ export class WarehouseController {
     return this.warehouseService.getAllWarehouses();
   }
 
+  @Get('my')
+  @UseGuards(JwtAuthGuard)
+  async getMyWarehouses(@User() user: { id: number; role: string }) {
+    // Returns all warehouses managed by the current user
+    return this.warehouseService.getWarehousesByUserId(user.id);
+  }
+
   @Get(':id')
   async getWarehouseById(@Param('id') id: number) {
     return this.warehouseService.getWarehouseById(id);

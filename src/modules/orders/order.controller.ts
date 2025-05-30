@@ -47,4 +47,15 @@ export class OrderController {
   cancelOrder(@Param('id') id: number) {
     return this.orderService.cancelOrder(id);
   }
+
+  @Get()
+  async getOrders(@Query('warehouseIds') warehouseIds?: string, @User() user?: UserEntity) {
+    if (warehouseIds) {
+      // warehouseIds is a comma-separated string of IDs
+      const ids = warehouseIds.split(',').map((id) => Number(id)).filter(Boolean);
+      return this.orderService.getOrdersByWarehouseIds(ids);
+    }
+    // fallback: return all orders (or restrict as needed)
+    return [];
+  }
 }
