@@ -4,6 +4,8 @@ import { Repository } from 'typeorm';
 import { Inventory } from './inventory.entity';
 import { Product } from '../products/product.entity';
 import { WarehouseManager } from '../warehouse-managers/warehouse-manager.entity';
+import { StockMovementService } from '../stock-movements/stock-movement.service';
+import { MovementType } from '../stock-movements/stock-movement.entity';
 
 @Injectable()
 export class InventoryService {
@@ -14,13 +16,14 @@ export class InventoryService {
     private readonly productRepository: Repository<Product>,
     @InjectRepository(WarehouseManager)
     private readonly warehouseManagerRepository: Repository<WarehouseManager>,
+    private readonly stockMovementService: StockMovementService,
   ) {}
 
   getAllInventory() {
     return this.inventoryRepository.find();
   }
 
-  addInventory(addInventoryDto: any) {
+  async addInventory(addInventoryDto: any) {
     const inventory = this.inventoryRepository.create(addInventoryDto);
     return this.inventoryRepository.save(inventory);
   }

@@ -5,6 +5,8 @@ import { Category } from '../categories/category.entity';
 import { Subcategory } from '../subcategories/subcategory.entity';
 import { Warehouse } from '../warehouses/warehouse.entity';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import { StockMovementService } from '../stock-movements/stock-movement.service';
+import { MovementType } from '../stock-movements/stock-movement.entity';
 
 @Injectable()
 export class ProductService {
@@ -12,6 +14,7 @@ export class ProductService {
     @Inject('PRODUCT_REPOSITORY')
     private readonly productRepository: Repository<Product>,
     private readonly eventEmitter: EventEmitter2,
+    private readonly stockMovementService: StockMovementService,
   ) {}
 
   async createProduct(createProductDto: any) {
@@ -32,16 +35,21 @@ export class ProductService {
     // Check if a product with the same name and warehouse ID exists
     const existingProduct = await this.productRepository.findOne({
       where: { name, warehouse: { id: warehouseId } },
+      relations: ['warehouse'],
     });
 
     if (existingProduct) {
       // Increment the quantity of the existing product
       existingProduct.quantity += quantity;
       const updatedProduct = await this.productRepository.save(existingProduct);
-
-      // Emit an event instead of directly calling StockMovementService
+      // Record stock movement (IN)
+      await this.stockMovementService.recordStockMovement({
+        product: existingProduct,
+        warehouse: existingProduct.warehouse,
+        quantity,
+        movement_type: MovementType.IN,
+      });
       this.eventEmitter.emit('product.updated', { product: updatedProduct, quantity });
-
       return updatedProduct;
     }
 
@@ -61,10 +69,14 @@ export class ProductService {
       ...rest,
     });
     const savedProduct = await this.productRepository.save(product);
-
-    // Emit an event instead of directly calling StockMovementService
+    // Record stock movement (IN)
+    await this.stockMovementService.recordStockMovement({
+      product: savedProduct,
+      warehouse: warehouse,
+      quantity,
+      movement_type: MovementType.IN,
+    });
     this.eventEmitter.emit('product.created', { product: savedProduct, quantity });
-
     return savedProduct;
   }
 
@@ -103,8 +115,20 @@ export class ProductService {
   }
 
   async updateProduct(id: number, updateProductDto: any) {
+    const prev = await this.productRepository.findOne({ where: { id }, relations: ['warehouse'] });
     await this.productRepository.update(id, updateProductDto);
-    return this.productRepository.findOne({ where: { id } });
+    const updated = await this.productRepository.findOne({ where: { id }, relations: ['warehouse'] });
+    if (prev && updated && prev.quantity !== updated.quantity) {
+      const movementType = updated.quantity > prev.quantity ? MovementType.IN : MovementType.OUT;
+      const movementQty = Math.abs(updated.quantity - prev.quantity);
+      await this.stockMovementService.recordStockMovement({
+        product: updated,
+        warehouse: updated.warehouse,
+        quantity: movementQty,
+        movement_type: movementType,
+      });
+    }
+    return updated;
   }
 
   async deleteProduct(id: number) {
