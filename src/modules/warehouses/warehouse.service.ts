@@ -92,4 +92,13 @@ export class WarehouseService {
       select: ['id', 'name', 'capacity', 'created_at'],
     });
   }
+
+  async getWarehousesByUserId(userId: number) {
+    // Returns all warehouses where the manager's user ID matches
+    return this.warehouseRepository.find({
+      where: { manager: { id: userId } },
+      relations: ['location', 'manager'],
+      select: ['id', 'name', 'capacity', 'created_at'],
+    });
+  }
 }

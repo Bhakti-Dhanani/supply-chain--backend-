@@ -224,4 +224,42 @@ export class OrderService {
       };
     });
   }
+
+  async getOrdersByWarehouseIds(warehouseIds: number[]): Promise<any[]> {
+    if (!warehouseIds || warehouseIds.length === 0) return [];
+    // Find all orders where any orderItem is associated with one of the given warehouses
+    const orders = await this.orderRepository.createQueryBuilder('order')
+      .leftJoinAndSelect('order.vendor', 'vendor')
+      .leftJoinAndSelect('order.location', 'location')
+      .leftJoinAndSelect('order.orderItems', 'orderItems')
+      .leftJoinAndSelect('orderItems.product', 'product')
+      .leftJoinAndSelect('orderItems.warehouse', 'warehouse')
+      .where('orderItems.warehouse IN (:...warehouseIds)', { warehouseIds })
+      .orderBy('order.created_at', 'DESC')
+      .getMany();
+    // Format for frontend
+    return orders.map(order => {
+      const warehouse = order.orderItems?.[0]?.warehouse;
+      return {
+        id: order.id,
+        status: order.status,
+        vendor: order.vendor ? { id: order.vendor.id, name: order.vendor.name } : null,
+        total_amount: order.total_amount,
+        created_at: order.created_at,
+        location: order.location ? {
+          house: order.location.house,
+          street: order.location.street,
+          city: order.location.city,
+          state: order.location.state,
+          country: order.location.country,
+          latitude: order.location.latitude,
+          longitude: order.location.longitude,
+        } : null,
+        warehouse: warehouse ? {
+          id: warehouse.id,
+          name: warehouse.name,
+        } : null,
+      };
+    });
+  }
 }

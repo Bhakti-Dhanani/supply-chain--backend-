@@ -86,12 +86,20 @@ export class ProductService {
     return query.getMany();
   }
 
+  // Added logging to debug query results
   async getAllProducts() {
-    return this.productRepository.find();
+    const products = await this.productRepository.find({
+      relations: ['category', 'subcategory', 'warehouse'],
+    });
+    console.log('Fetched products:', products); // Debug log
+    return products;
   }
 
   async getProductById(id: number) {
-    return this.productRepository.findOne({ where: { id } });
+    return this.productRepository.findOne({
+      where: { id },
+      relations: ['category', 'subcategory', 'warehouse'],
+    });
   }
 
   async updateProduct(id: number, updateProductDto: any) {
