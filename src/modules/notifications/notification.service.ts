@@ -22,4 +22,8 @@ export class NotificationService {
   getNotificationsForUsers(userIds: number[]) {
     return this.notificationRepository.find({ where: { user: { id: In(userIds) } } });
   }
+
+  getNotificationsForUser(userId: number) {
+    return this.notificationRepository.find({ where: { user: { id: userId } } });
+  }
 }
