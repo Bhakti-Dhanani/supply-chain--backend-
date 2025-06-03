@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, In } from 'typeorm';
 import { Notification } from './notification.entity';
 
 @Injectable()
@@ -16,5 +16,14 @@ export class NotificationService {
 
   markAsRead(id: number) {
     return this.notificationRepository.update(id, { is_read: true });
+  }
+
+  // Updated method to fetch notifications for multiple user IDs
+  getNotificationsForUsers(userIds: number[]) {
+    return this.notificationRepository.find({ where: { user: { id: In(userIds) } } });
+  }
+
+  getNotificationsForUser(userId: number) {
+    return this.notificationRepository.find({ where: { user: { id: userId } } });
   }
 }

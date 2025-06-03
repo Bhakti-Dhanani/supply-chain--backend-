@@ -25,4 +25,24 @@ export class StockMovementService {
 
     return savedStockMovement;
   }
+
+  async getStockMovementsByWarehouseIds(warehouseIds: number[]) {
+    if (!warehouseIds.length) return [];
+    return this.stockMovementRepository.createQueryBuilder('stock_movement')
+      .leftJoinAndSelect('stock_movement.product', 'product')
+      .leftJoinAndSelect('stock_movement.warehouse', 'warehouse')
+      .where('stock_movement.warehouse IN (:...warehouseIds)', { warehouseIds })
+      .orderBy('stock_movement.created_at', 'DESC')
+      .getMany();
+  }
+
+  async getStockMovementsByWarehouseIdsQB(warehouseIds: number[]) {
+    if (!warehouseIds.length) return [];
+    return this.stockMovementRepository.createQueryBuilder('movement')
+      .leftJoinAndSelect('movement.product', 'product')
+      .leftJoinAndSelect('movement.warehouse', 'warehouse')
+      .where('movement.warehouse IN (:...warehouseIds)', { warehouseIds })
+      .orderBy('movement.created_at', 'DESC')
+      .getMany();
+  }
 }
