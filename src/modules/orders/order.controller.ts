@@ -53,7 +53,7 @@ export class OrderController {
     if (warehouseIds) {
       // warehouseIds is a comma-separated string of IDs
       const ids = warehouseIds.split(',').map((id) => Number(id)).filter(Boolean);
-      return this.orderService.getOrdersByWarehouseIds(ids);
+      return this.orderService.getOrdersByWarehouseIds(ids); // Pass only warehouseIds
     }
     // fallback: return all orders (or restrict as needed)
     return [];

@@ -1,5 +1,6 @@
 import { Controller, Get, Param, Post, Body, Put } from '@nestjs/common';
 import { ShipmentService } from './shipment.service';
+import { CreateShipmentDto } from './dto/create-shipment.dto';
 
 @Controller('shipments')
 export class ShipmentController {
@@ -18,5 +19,10 @@ export class ShipmentController {
   @Put(':id')
   updateShipmentStatus(@Param('id') id: number, @Body() updateShipmentStatusDto: any) {
     return this.shipmentService.updateShipmentStatus(id, updateShipmentStatusDto);
+  }
+
+  @Post('create')
+  async createShipmentWithVehicleSelection(@Body() createShipmentDto: CreateShipmentDto) {
+    return this.shipmentService.createShipmentWithVehicleSelection(createShipmentDto);
   }
 }

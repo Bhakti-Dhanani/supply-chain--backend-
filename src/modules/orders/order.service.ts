@@ -237,6 +237,7 @@ export class OrderService {
       .where('orderItems.warehouse IN (:...warehouseIds)', { warehouseIds })
       .orderBy('order.created_at', 'DESC')
       .getMany();
+
     // Format for frontend
     return orders.map(order => {
       const warehouse = order.orderItems?.[0]?.warehouse;

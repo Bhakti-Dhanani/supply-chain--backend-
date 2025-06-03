@@ -11,7 +11,7 @@ import { ProductModule } from './modules/products/product.module';
 import { OrderModule } from './modules/orders/order.module';
 import { ShipmentModule } from './modules/shipments/shipment.module';
 import { InventoryModule } from './modules/inventory/inventory.module';
-import { NotificationModule } from './modules/notifications/notification.module';
+import { NotificationsModule } from './modules/notifications/notifications.module';
 import { AuditLogModule } from './modules/audit-logs/audit-log.module';
 import { VehicleLogModule } from './modules/vehicle-logs/vehicle-log.module';
 import { ReorderAlertModule } from './modules/reorder-alerts/reorder-alert.module';
@@ -84,7 +84,7 @@ import { DataSource } from 'typeorm';
     OrderModule,
     ShipmentModule,
     InventoryModule,
-    NotificationModule,
+    NotificationsModule,
     AuditLogModule,
     VehicleLogModule,
     ReorderAlertModule,

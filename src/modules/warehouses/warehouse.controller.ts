@@ -43,4 +43,9 @@ export class WarehouseController {
   async deleteWarehouse(@Param('id') id: number) {
     return this.warehouseService.deleteWarehouse(id);
   }
+
+  @Get(':id/space-utilization')
+  async getSpaceUtilization(@Param('id') id: number) {
+    return this.warehouseService.calculateSpaceUtilization(id);
+  }
 }
