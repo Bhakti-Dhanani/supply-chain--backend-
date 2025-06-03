@@ -5,7 +5,8 @@ import { User } from '../../common/decorators/user.decorator';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Product } from '../products/product.entity';
-import { WarehouseManager } from '../warehouse-managers/warehouse-manager.entity';
+import { WarehouseManager } from '../warehouse-managers/warehouse-manager.entity
+
 
 @Controller('inventory')
 export class InventoryController {
@@ -17,6 +18,7 @@ export class InventoryController {
     @User() user: { id: number; role: string },
     @Query('categoryId') categoryId?: string,
     @Query('subcategoryId') subcategoryId?: string,
+
     @Query('search') search?: string,
     @Query('warehouseId') warehouseId?: string
   ) {
@@ -28,6 +30,7 @@ export class InventoryController {
       search,
       warehouseId,
     });
+  
   }
 
   @Get()
