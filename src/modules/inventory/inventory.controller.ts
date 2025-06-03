@@ -5,7 +5,7 @@ import { User } from '../../common/decorators/user.decorator';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Product } from '../products/product.entity';
-import { WarehouseManager } from '../warehouse-managers/warehouse-manager.entity
+import { WarehouseManager } from '../warehouse-managers/warehouse-manager.entity';
 
 
 @Controller('inventory')

@@ -12,6 +12,6 @@ import { TransporterModule } from '../transporters/transporter.module';
   ],
   controllers: [VehicleController],
   providers: [VehicleService],
-  exports: [VehicleService],
+  exports: [VehicleService, TypeOrmModule], // Export TypeOrmModule
 })
 export class VehicleModule {}
