@@ -27,4 +27,14 @@ export class WarehouseLocationService {
     const location = await this.createWarehouseLocation(address);
     return location.id;
   }
+
+  async getWarehouseLocationsWithUtilization() {
+    return this.warehouseLocationRepository.query(`
+      SELECT wl.id, wl.house, wl.street, wl.city, wl.state, wl.country,
+             wp.total_capacity, wp.stock_available,
+             ROUND((wp.stock_available / wp.total_capacity) * 100, 2) AS utilization
+      FROM warehouse_locations wl
+      JOIN warehouse_products wp ON wl.id = wp.warehouse_location_id
+    `);
+  }
 }

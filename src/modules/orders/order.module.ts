@@ -5,9 +5,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Order } from './order.entity';
 import { OrderItem } from '../order-items/order-item.entity';
 import { ProductModule } from '../products/product.module';
-import { NotificationModule } from '../notifications/notification.module';
+import { NotificationsModule } from '../notifications/notifications.module';
 import { SocketModule } from '../../common/gateway/socket.module';
-import { NotificationService } from '../notifications/notification.service';
+import { NotificationsService } from '../notifications/notifications.service';
 import { Product } from '../products/product.entity';
 import { Warehouse } from '../warehouses/warehouse.entity';
 import { LocationModule } from '../location/location.module';
@@ -17,11 +17,11 @@ import { Location } from '../location/location.entity';
   imports: [
     TypeOrmModule.forFeature([Order, OrderItem, Product, Warehouse, Location]),
     ProductModule,
-    NotificationModule,
+    NotificationsModule,
     SocketModule,
     LocationModule,
   ],
   controllers: [OrderController],
-  providers: [OrderService, NotificationService],
+  providers: [OrderService, NotificationsService],
 })
 export class OrderModule {}

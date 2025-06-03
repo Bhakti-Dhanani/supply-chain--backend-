@@ -26,4 +26,8 @@ export class SubcategoryService {
   async deleteSubcategory(id: number): Promise<DeleteResult> {
     return this.subcategoryRepository.delete(id);
   }
+
+  getSubcategoriesByCategoryId(categoryId: number) {
+    return this.subcategoryRepository.find({ where: { category: { id: categoryId } } });
+  }
 }

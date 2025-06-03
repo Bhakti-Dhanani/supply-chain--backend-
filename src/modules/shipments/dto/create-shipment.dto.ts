@@ -12,4 +12,8 @@ export class CreateShipmentDto {
   @IsNotEmpty()
   @IsString()
   vehicleId: string;
+
+  @IsNotEmpty()
+  @IsNumber()
+  userId: number;
 }

@@ -94,11 +94,22 @@ export class WarehouseService {
   }
 
   async getWarehousesByUserId(userId: number) {
-    // Returns all warehouses where the manager's user ID matches
     return this.warehouseRepository.find({
       where: { manager: { id: userId } },
       relations: ['location', 'manager'],
       select: ['id', 'name', 'capacity', 'created_at'],
     });
+  }
+
+  async calculateSpaceUtilization(warehouseId: number): Promise<{ utilizedSpace: number; totalCapacity: number }> {
+    const warehouse = await this.warehouseRepository.findOne({ where: { id: warehouseId }, relations: ['products'] });
+    if (!warehouse) {
+      throw new NotFoundException('Warehouse not found');
+    }
+
+    const totalCapacity = warehouse.capacity;
+    const utilizedSpace = warehouse.products.reduce((sum, product) => sum + product.quantity, 0);
+
+    return { utilizedSpace, totalCapacity };
   }
 }
