@@ -6,8 +6,8 @@ export class Vehicle {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => Transporter, (transporter) => transporter.id)
-  transporter: Transporter;
+  @ManyToOne(() => Transporter, (transporter) => transporter.vehicles)
+  transporter: Transporter; // Update relationship to reference `vehicles` in Transporter
 
   @Column()
   plate_number: string;

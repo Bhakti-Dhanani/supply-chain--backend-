@@ -43,6 +43,7 @@ export class OrderService {
       vendor: vendor,
       status: OrderStatus.PENDING,
       total_amount: 0,
+      warehouse: warehouse, // Set warehouse relation
     });
     await this.orderRepository.save(order);
 
@@ -262,5 +263,17 @@ export class OrderService {
         } : null,
       };
     });
+  }
+
+  async deleteOrder(id: number): Promise<string> {
+    const order = await this.getOrderById(id);
+    if (order.status === OrderStatus.PENDING) {
+      // Delete related order items first
+      await this.orderItemRepository.delete({ order: { id: order.id } });
+      // Delete the order
+      await this.orderRepository.remove(order);
+      return `Order with ID ${id} has been successfully deleted.`;
+    }
+    return `Order with ID ${id} cannot be deleted as it is currently ${order.status}.`;
   }
 }

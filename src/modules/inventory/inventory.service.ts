@@ -25,7 +25,20 @@ export class InventoryService {
 
   async addInventory(addInventoryDto: any) {
     const inventory = this.inventoryRepository.create(addInventoryDto);
-    return this.inventoryRepository.save(inventory);
+    const savedInventory = await this.inventoryRepository.save(inventory);
+
+    // Record stock movement
+    await this.stockMovementService.recordStockMovement({
+      product: addInventoryDto.productId,
+      warehouse: addInventoryDto.warehouseId,
+      quantity: addInventoryDto.quantity,
+      movement_type: MovementType.IN,
+    });
+
+    // Update product stock
+    await this.productRepository.increment({ id: addInventoryDto.productId }, 'stock', addInventoryDto.quantity);
+
+    return savedInventory;
   }
 
   updateInventory(id: number, updateInventoryDto: any) {

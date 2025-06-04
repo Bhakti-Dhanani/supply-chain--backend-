@@ -48,6 +48,11 @@ export class OrderController {
     return this.orderService.cancelOrder(id);
   }
 
+  @Delete(':id/delete')
+  async deleteOrder(@Param('id') id: number) {
+    return this.orderService.deleteOrder(id);
+  }
+
   @Get()
   async getOrders(@Query('warehouseIds') warehouseIds?: string, @User() user?: UserEntity) {
     if (warehouseIds) {

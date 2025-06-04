@@ -3,6 +3,7 @@ import { Vendor } from '../vendors/vendor.entity';
 import { User } from '../users/user.entity';
 import { Location } from '../location/location.entity';
 import { OrderItem } from '../order-items/order-item.entity';
+import { Warehouse } from '../warehouses/warehouse.entity';
 
 export enum OrderStatus {
   PENDING = 'Pending',
@@ -21,6 +22,9 @@ export class Order {
 
   @ManyToOne(() => Location, { nullable: true })
   location: Location;
+
+  @ManyToOne(() => Warehouse, { nullable: true })
+  warehouse: Warehouse;
 
   @Column({ type: 'enum', enum: OrderStatus })
   status: OrderStatus;
