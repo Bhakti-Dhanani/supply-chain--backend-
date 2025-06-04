@@ -25,4 +25,14 @@ export class ShipmentController {
   async createShipmentWithVehicleSelection(@Body() createShipmentDto: CreateShipmentDto) {
     return this.shipmentService.createShipmentWithVehicleSelection(createShipmentDto);
   }
+
+  @Get()
+  async getAllShipments() {
+    return this.shipmentService.getAllShipments();
+  }
+
+  @Get('assigned')
+  async getAssignedShipments() {
+    return this.shipmentService.getAllShipments();
+  }
 }
