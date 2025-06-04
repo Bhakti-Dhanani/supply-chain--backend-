@@ -45,4 +45,12 @@ export class ProductController {
   async getProductById(@Param('id') id: number) {
     return this.productService.getProductById(id);
   }
+
+  @Put(':id/quantity')
+  async updateProductQuantity(
+    @Param('id') id: number,
+    @Body() updateQuantityDto: { quantity: number },
+  ) {
+    return this.productService.updateProductQuantity(id, updateQuantityDto.quantity);
+  }
 }
