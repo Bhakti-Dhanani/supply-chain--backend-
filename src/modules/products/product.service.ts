@@ -131,6 +131,28 @@ export class ProductService {
     return updated;
   }
 
+  async updateProductQuantity(id: number, newQuantity: number) {
+    const product = await this.productRepository.findOne({ where: { id }, relations: ['warehouse'] });
+    if (!product) {
+      throw new NotFoundException(`Product with ID ${id} not found`);
+    }
+
+    const movementType = newQuantity > product.quantity ? MovementType.IN : MovementType.OUT;
+    const movementQty = Math.abs(newQuantity - product.quantity);
+
+    product.quantity = newQuantity;
+    const updatedProduct = await this.productRepository.save(product);
+
+    await this.stockMovementService.recordStockMovement({
+      product: updatedProduct,
+      warehouse: updatedProduct.warehouse,
+      quantity: movementQty,
+      movement_type: movementType,
+    });
+
+    return updatedProduct;
+  }
+
   async deleteProduct(id: number) {
     await this.productRepository.delete(id);
     return { deleted: true };
