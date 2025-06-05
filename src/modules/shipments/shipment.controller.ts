@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Post, Body, Put } from '@nestjs/common';
+import { Controller, Get, Param, Post, Body, Put, BadRequestException } from '@nestjs/common';
 import { ShipmentService } from './shipment.service';
 import { CreateShipmentDto } from './dto/create-shipment.dto';
 
@@ -7,8 +7,12 @@ export class ShipmentController {
   constructor(private readonly shipmentService: ShipmentService) {}
 
   @Get(':id')
-  async getShipmentDetails(@Param('id') id: number) {
-    return this.shipmentService.getShipmentDetails(id);
+  async getShipmentDetails(@Param('id') id: string) {
+    const parsedId = parseInt(id, 10);
+    if (isNaN(parsedId)) {
+      throw new BadRequestException('Invalid ID parameter. ID must be an integer.');
+    }
+    return this.shipmentService.getShipmentDetails(parsedId);
   }
 
   @Post()
